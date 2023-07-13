@@ -1,0 +1,100 @@
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, IconButton } from '@material-ui/core';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+
+const NavigationBar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track user login state
+  const history = useHistory();
+
+  const handleSignIn = () => {
+    // Perform API call to log the user in
+    // Use the /auth endpoint for user login
+    // You can replace the placeholder endpoint with your actual backend API endpoint
+    fetch('/auth', {
+      method: 'POST',
+      // Include any necessary request headers or body
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle the API response as needed
+        // If login is successful, update the login state and redirect to the products page
+        setIsLoggedIn(true);
+        history.push('/products');
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the API call
+        console.log(error);
+      });
+  };
+
+  const handleSignUp = () => {
+    // Perform API call to register the user
+    // Use the /users endpoint for user registration
+    // You can replace the placeholder endpoint with your actual backend API endpoint
+    fetch('/users', {
+      method: 'POST',
+      // Include any necessary request headers or body
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle the API response as needed
+        // If registration is successful, update the login state and redirect to the products page
+        setIsLoggedIn(true);
+        history.push('/products');
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the API call
+        console.log(error);
+      });
+  };
+
+  const handleProductSearch = (searchTerm) => {
+    // Perform API call to search for products
+    // Use the /products endpoint for product search
+    // You can replace the placeholder endpoint with your actual backend API endpoint
+    fetch(`/products?search=${searchTerm}`)
+      .then(response => response.json())
+      .then(data => {
+        // Handle the API response as needed
+        // You can update the state or perform any other actions based on the search results
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the API call
+        console.log(error);
+      });
+  };
+
+  return (
+    <AppBar position="static">
+      <Toolbar>
+        <IconButton edge="start" color="inherit" aria-label="logo">
+          <ShoppingCartIcon />
+        </IconButton>
+        <Typography variant="h6" style={{ flexGrow: 1 }}>
+          Your App Name
+        </Typography>
+        <Button component={Link} to="/login" color="inherit">
+          Sign In
+        </Button>
+        <Button component={Link} to="/signup" color="inherit">
+          Sign Up
+        </Button>
+        {isLoggedIn && (
+          <Button component={Link} to="/products" color="inherit">
+            Products
+          </Button>
+        )}
+        <SearchBar onSearch={handleProductSearch} />
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+// Example SearchBar component
+const SearchBar = ({ onSearch }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSearch(searchTerm);

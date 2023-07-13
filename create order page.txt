@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+import { Stepper, Step, StepLabel, Button, Typography } from '@material-ui/core';
+
+const CreateOrderPage = () => {
+  const [activeStep, setActiveStep] = useState(0);
+
+  const handleNext = () => {
+    setActiveStep(prevActiveStep => prevActiveStep + 1);
+  };
+
+  const handleConfirmOrder = () => {
+    // Perform API call to create the order
+    // Use the /orders endpoint for order creation
+    // You can replace the placeholder endpoint with your actual backend API endpoint
+    fetch('/orders', {
+      method: 'POST',
+      // Include any necessary request headers or body
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle the API response as needed
+        // Display the confirmation message
+        console.log('Your order is confirmed.');
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the API call
+        console.log(error);
+      });
+  };
+
+  const steps = ['Step 1', 'Step 2', 'Step 3'];
+
+  const getStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return 'Step 1 Content';
+      case 1:
+        return 'Step 2 Content';
+      case 2:
+        return 'Step 3 Content';
+      default:
+        return 'Unknown step';
+    }
+  };
+
+  return (
+    <div>
+      <Stepper activeStep={activeStep}>
+        {steps.map((label, index) => (
+          <Step key={index}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+      <Typography>{getStepContent(activeStep)}</Typography>
+      <div>
+        {activeStep !== 0 && (
+          <Button onClick={() => setActiveStep(prevActiveStep => prevActiveStep - 1)}>Back</Button>
+        )}
+        {activeStep !== steps.length - 1 ? (
+          <Button variant="contained" color="primary" onClick={handleNext}>
+            Next
+          </Button>
+        ) : (
+          <Button variant="contained" color="primary" onClick={handleConfirmOrder}>
+            Confirm Order
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};

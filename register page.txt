@@ -1,0 +1,59 @@
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+
+const RegisterPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const history = useHistory();
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    
+    // Perform API call to register the user
+    // Use the /users endpoint for user registration
+    // You can replace the placeholder endpoint with your actual backend API endpoint
+    fetch('/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle the API response as needed
+        // If registration is successful, redirect to the products page
+        history.push('/products');
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the API call
+        console.log(error);
+      });
+  };
+
+  return (
+    <div>
+      <h2>Register</h2>
+      <form onSubmit={handleRegister}>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          required
+        />
+        <button type="submit">Register</button>
+      </form>
+      <p>
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
+    </div>
+  );
+};

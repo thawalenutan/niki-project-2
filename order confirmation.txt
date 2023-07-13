@@ -1,0 +1,18 @@
+const handleConfirmOrder = () => {
+    // Perform API call to create the order
+    // Use the /orders endpoint for order creation
+    // You can replace the placeholder endpoint with your actual backend API endpoint
+    fetch('http://localhost:3001/api/v1/orders', {
+      method: 'POST',
+      // Include any necessary request headers or body
+    })
+      .then(data => {
+        // Handle the API response as needed
+        // Display the confirmation message
+        console.log('Your order is confirmed.'+data);
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the API call
+        console.log(error);
+      });
+  };
