@@ -1,0 +1,311 @@
+// Product Page code
+
+import React, { useState, useEffect } from 'react';
+import Header from '../../common/Header/Header';
+import { CardActionArea } from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardMedia, Typography } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+// import ProductDetailPage from './ProductDetailPage';
+
+//import css file
+import './ProductPage.css';
+
+// Move useStyles object outside the component function
+const useStyles = {
+  root: {
+    width: 340,
+    margin: 20,
+  },
+  media: {
+    height: 200,
+  },
+  content: {
+    height: 150,
+    overflow: 'auto',
+  },
+};
+
+export default function ProductPage(props) {
+
+  // Fetch data from api call
+  const [product, setProduct] = useState([]);
+
+  const [isloggedIn, setisLoggedIn] = useState(false);
+
+  const navigate = useNavigate();
+ 
+ 
+
+  const fetchProduct = () => {
+    fetch('http://localhost:3001/api/v1/products', {
+      method: 'GET',
+      headers: { 'content-type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setProduct(data);
+      })
+      .catch((err) => {
+        console.log("Error fetching products", err);
+      });
+  };
+
+  useEffect(() => {
+     fetchProduct();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (isloggedIn) {
+       navigate('/product-page');
+    }
+  }, [navigate, isloggedIn]);
+  
+  const  handleLogOut = () => {
+    setisLoggedIn(false);
+     localStorage.removeItem('AUTH_TOKEN');
+     navigate('/sign-in');
+  }
+  const  handleLogin = () => {
+    setisLoggedIn(true);
+  }
+
+  return (
+    <div>
+      <Header isLogin={handleLogin} handleLogOut = {handleLogOut} />
+        <div className='main-containr'>
+        {product.length > 0 &&
+          product.map((product) => (
+            <div className='card-containr'>
+              <Card className={useStyles.root} key={product._id}>
+                <CardActionArea>
+                  <CardMedia
+                    component="img"
+                    alt={product.name}
+                    style={{ height: 200 }}
+                    src={product.imageURL}
+                    title={product.name}
+                  />
+                  <CardContent className={useStyles.content}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Typography gutterBottom variant="h6" component="h2">
+                        {product.name}
+                      </Typography>
+                      <Typography gutterBottom variant="h6" component="h2">
+                        {"Rs. " + product.price}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="textSecondary" component="p">
+                      {product.description}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+                <CardActions>
+                  <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
+                      <Link to={`/product-details/${product._id}`}><Button size="small" variant="contained" color="primary" >
+                        Buy
+                      </Button></Link>
+                  </Box>
+                  <IconButton onClick={props.onEdit}>Edit</IconButton>
+                  <IconButton onClick={props.onDelete}>
+                    Delete
+                  </IconButton>
+                </CardActions>
+              </Card>
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+}
+-------------------------------------------Product Detailse code--------------------
+
+import React, { useState, useEffect } from 'react';
+import Header from '../../common/Header/Header';
+import { Button } from '@mui/material';
+import { CardActionArea } from '@mui/material';
+import { Card, CardActions, CardContent, CardMedia, Typography } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
+import { Link, useParams } from 'react-router-dom';
+
+
+
+
+const useStyles = {
+  root: {
+    width: 340,
+    margin: 20,
+  },
+  media: {
+    height: 200,
+  },
+  content: {
+    height: 150,
+    overflow: 'auto',
+  },
+};
+
+export default function ProductDetailPage(props) {
+
+  const { id } = useParams();
+
+  const [product, setProduct] = useState([]);
+
+  useEffect(() => {
+    fetchProduct(`${id}`);
+  }, [id])
+
+  const fetchProduct = (id) => {
+    fetch(`http://localhost:3001/api/v1/products/${id}`, {
+      method: 'GET',
+      headers: { 'content-type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setProduct(data);
+      })
+      .catch((err) => {
+        console.log("Error fetching product details", err);
+      });
+  }
+
+
+  if (!product) {
+    return <div><Header />Loading...</div>;
+  }
+
+  return (
+    <div>
+      <Header />
+      <div className='card-containr'>
+        <Card className={useStyles.root} key={product._id}>
+          <CardActionArea>
+            <CardMedia
+              component="img"
+              alt={product.name}
+              style={{ height: 200 }}
+              src={product.imageURL}
+              title={product.name}
+            />
+            <CardContent className={useStyles.content}>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography gutterBottom variant="h6" component="h2">
+                  {product.name}
+                </Typography>
+                <Typography gutterBottom variant="h6" component="h2">
+                  {"Rs. " + product.price}
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="textSecondary" component="p">
+                {product.description}
+              </Typography>
+            </CardContent>
+          </CardActionArea>
+          <CardActions>
+            <Box display="flex" width="100%" justifyContent="space-between" alignItems="center">
+              <Link to={`/createorder-page/${id}`}><Button size="small" variant="contained" color="primary" >
+                continue
+              </Button></Link>
+            </Box>
+            <IconButton onClick={props.onEdit}>Edit</IconButton>
+            <IconButton onClick={props.onDelete}>
+              Delete
+            </IconButton>
+          </CardActions>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+------------------------------------Main Page code-------------------------------------------------------
+
+
+import React, { useState } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import SignInDialog from './common/Header/Dialog/SignInDialog';
+import SignUpDialog from './common/Header/Dialog/SignUpDialog';
+import ProductPage from './components/product/ProductPage';
+import ProductDetailPage from './components/product/ProductDetailPage';
+import Home from './components/Home/Home';
+import CreateOrderPage from './components/createorderPlacing/CreateOrderPage';
+
+
+export default function Eshop() {
+  
+  const onBuy = () => {
+    console.log("buy clicked");
+    //  setShowProductDetails(true);
+  };
+
+  const [product, setProduct] = useState([]);
+ 
+
+  const fetchProduct = () => {
+    fetch('http://localhost:3001/api/v1/products', {
+      method: 'GET',
+      headers: { 'content-type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setProduct(data);
+      })
+      .catch((err) => {
+        console.log("Error fetching products", err);
+      });
+  };
+  
+  // const id = '63b8ad33fcd0f71d2493a816';
+  return (
+    <div>
+      <BrowserRouter>
+        <Routes>
+          <Route exact path="/" element={<Home />} />
+          <Route exact path="/sign-in" element={<SignInDialog />} />
+          <Route exact path="/sign-up" element={<SignUpDialog />} />
+          <Route exact path="/product-page" element={<ProductPage onBuy={onBuy} productlist = {fetchProduct} state = {product} />} />
+            <Route exact path="/product-details/:id" element={<ProductDetailPage />} />
+            <Route exact path="/createorder-page/:id" element={<CreateOrderPage />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
